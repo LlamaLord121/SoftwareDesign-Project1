@@ -14,7 +14,7 @@ import java.util.Random;
 public class WordBankReader {
     public static String getWord(int letterCount) {
         try { // Opening a file with scanner, wrapping it in a basic try/except block.
-            File wordBank = new File("WordBank.txt");
+            File wordBank = new File("Src/WordBank.txt");
             Scanner scanner = new Scanner(wordBank);
 
             String lengthHeader = "-" + letterCount;
