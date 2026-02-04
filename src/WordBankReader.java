@@ -30,11 +30,44 @@ public class WordBankReader {
                     foundHeader = true;
                 }
             } else if (foundHeader && !currentLine.trim().isEmpty()) {
-                wordCount += 1;
+                wordCount += 1; // Starts counting length to next section
             }
         }
 
         scanner.close();
-        
+
+        if (wordCount == 0) {
+            return null; // Base case
+        }
+
+        Random random = new Random();
+        int randomWord = random.nextInt(wordCount);
+
+        scanner =  new Scanner(wordBank);
+        foundHeader = false;
+        int currentIndex = 0;
+
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+
+            if (line.startsWith("-")) {
+                if (foundHeader) {
+                    break;
+                }
+                if (line.equals(lengthHeader)) {
+                    foundHeader = true;
+                }
+            }
+            else if (foundHeader && !line.trim().isEmpty()) {
+                if (currentIndex == randomWord) {
+                    scanner.close();
+                    return line.trim();
+                }
+                currentIndex++;
+            }
+        }
+
+        scanner.close();
+        return null;
     }
 }
