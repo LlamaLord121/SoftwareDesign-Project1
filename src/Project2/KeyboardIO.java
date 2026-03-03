@@ -9,20 +9,25 @@ import java.util.Map;
 public class KeyboardIO implements ActionListener {
 
     private Map<String, JButton> keyMap = new HashMap<>();
+    private JLabel wordDisplay;
+    private JTextArea guessLog;
+    private String currentWord = "";
 
     // Base key - standard size
+
     class GeneralKey extends JButton {
-        public GeneralKey(String key) {
-            super(key);
+        public GeneralKey(String label) {
+            super(label);
             setPreferredSize(new Dimension(45, 50));
             setOpaque(true);
         }
     }
 
     // Custom key (Enter/Backspace) - can override width
+
     class CustomKey extends GeneralKey {
-        public CustomKey(String key, int width) {
-            super(key);
+        public CustomKey(String label, int width) {
+            super(label);
             setPreferredSize(new Dimension(width, 50));
         }
     }
@@ -32,41 +37,84 @@ public class KeyboardIO implements ActionListener {
         keyboard.go();
     }
 
+    // Call this from anywhere to push a new line into the scrolling box
+    public void logMessage(String message) {
+        if (guessLog.getDocument().getLength() == 0) {
+            guessLog.append(message);
+        } else {
+            guessLog.append("\n" + message);
+        }
+        guessLog.setCaretPosition(guessLog.getDocument().getLength());
+    }
+
     public void go() {
         JFrame frame = new JFrame();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 250);
+        frame.setSize(500, 500);
+        frame.setResizable(false);
 
-        JPanel keyboardPanel = new JPanel();
-        keyboardPanel.setLayout(new BoxLayout(keyboardPanel, BoxLayout.Y_AXIS));
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+        // Guess log
+
+        guessLog = new JTextArea();
+        guessLog.setFont(new Font("Arial", Font.PLAIN, 24));
+        guessLog.setEditable(false);
+        guessLog.setLineWrap(true);
+        guessLog.setWrapStyleWord(true);
+
+        JScrollPane scrollPane = new JScrollPane(guessLog);
+        scrollPane.setMaximumSize(new Dimension(500, 160));
+        scrollPane.setPreferredSize(new Dimension(500, 160));
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mainPanel.add(scrollPane);
+
+        // Word display
+
+        wordDisplay = new JLabel("", SwingConstants.CENTER);
+        wordDisplay.setFont(new Font("Arial", Font.BOLD, 32));
+        wordDisplay.setMaximumSize(new Dimension(500, 60));
+        wordDisplay.setPreferredSize(new Dimension(500, 60));
+        wordDisplay.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        wordDisplay.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mainPanel.add(wordDisplay);
+
+        // Keyboard
 
         String[] rows = {"QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"};
 
         for (String row : rows) {
-            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 4));
-            for (char currentKey : row.toCharArray()) { // Build the interperitable array
-                GeneralKey button = new GeneralKey(String.valueOf(currentKey));
-                button.addActionListener(this);
-                rowPanel.add(button);
-                keyMap.put(String.valueOf(currentKey), button);
+            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2));
+            rowPanel.setMaximumSize(new Dimension(500, 54));
+            rowPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            for (char c : row.toCharArray()) { // Build the keyboard button array
+                GeneralKey btn = new GeneralKey(String.valueOf(c));
+                btn.addActionListener(this);
+                rowPanel.add(btn);
+                keyMap.put(String.valueOf(c), btn);
             }
-            keyboardPanel.add(rowPanel);
+            mainPanel.add(rowPanel);
         }
 
-        // Enter and Backspace on their own dedicated row, initialized seperately so they can't be locked or colored
-        JPanel actionRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 4));
+        // Enter and Backspace on their own row, initialized separately so they can't be locked or colored
 
-        CustomKey enterButton = new CustomKey("ENTER", 90); // 2x normal width
-        enterButton.addActionListener(this);
+        JPanel actionRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 2, 2));
+        actionRow.setMaximumSize(new Dimension(500, 54));
+        actionRow.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        CustomKey backspaceButton = new CustomKey("⌫", 55); // standard width
-        backspaceButton.addActionListener(this);
+        CustomKey enterBtn = new CustomKey("ENTER", 90); // 2x normal width
+        enterBtn.addActionListener(this);
 
-        actionRow.add(enterButton);
-        actionRow.add(backspaceButton);
-        keyboardPanel.add(actionRow);
+        CustomKey backBtn = new CustomKey("⌫", 55);
+        backBtn.addActionListener(this);
 
-        frame.getContentPane().add(keyboardPanel);
+        actionRow.add(enterBtn);
+        actionRow.add(backBtn);
+        mainPanel.add(actionRow);
+
+        frame.add(mainPanel);
         frame.setVisible(true);
     }
 
@@ -74,15 +122,23 @@ public class KeyboardIO implements ActionListener {
         String pressed = ((JButton) event.getSource()).getText();
 
         if (pressed.equals("ENTER")) {
-            System.out.println("Enter");
+            if (!currentWord.isEmpty()) {
+                logMessage(currentWord);
+                System.out.println("Submit guess: " + currentWord);
+                currentWord = "";
+            }
             // Logic Hook
         } else if (pressed.equals("⌫")) {
-            System.out.println("Backspace");
+            if (!currentWord.isEmpty()) {
+                currentWord = currentWord.substring(0, currentWord.length() - 1);
+            }
             // Logic Hook
         } else {
-            System.out.println(pressed);
+            currentWord += pressed;
             // Logic Hook
         }
+
+        wordDisplay.setText(currentWord);
     }
 
     // Use to color the keys when they get locked
