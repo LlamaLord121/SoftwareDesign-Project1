@@ -1,10 +1,11 @@
 package Project2;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.*;
+
 
 public class KeyboardIO implements ActionListener {
 
@@ -12,6 +13,7 @@ public class KeyboardIO implements ActionListener {
     private JLabel wordDisplay;
     private JTextArea guessLog;
     private String currentWord = "";
+    private ClientNetworking client;
 
     // Base key - standard size
 
@@ -116,6 +118,14 @@ public class KeyboardIO implements ActionListener {
 
         frame.add(mainPanel);
         frame.setVisible(true);
+
+        client = new ClientNetworking(this);
+        try {
+            client.connectLocal();
+            logMessage("Connected to server");
+        } catch (Exception e) {
+            logMessage("Could not connect to server");
+}
     }
 
     public void actionPerformed(ActionEvent event) {
@@ -123,19 +133,19 @@ public class KeyboardIO implements ActionListener {
 
         if (pressed.equals("ENTER")) {
             if (!currentWord.isEmpty()) {
-                logMessage(currentWord);
-                System.out.println("Submit guess: " + currentWord);
+                if (client != null) {
+                    client.sendGuess(currentWord.toLowerCase());
+                } else {
+                    logMessage("Not connected");
+                }
                 currentWord = "";
             }
-            // Logic Hook
         } else if (pressed.equals("⌫")) {
             if (!currentWord.isEmpty()) {
                 currentWord = currentWord.substring(0, currentWord.length() - 1);
             }
-            // Logic Hook
         } else {
             currentWord += pressed;
-            // Logic Hook
         }
 
         wordDisplay.setText(currentWord);
