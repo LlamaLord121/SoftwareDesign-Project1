@@ -1,4 +1,4 @@
-// Gameplay loop / reprompts logic assumed to live in main, likely makes more logical sense
+package Project1;// Gameplay loop / reprompts logic assumed to live in main, likely makes more logical sense
 //
 
 public class  GameLogic {

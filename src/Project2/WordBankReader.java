@@ -9,7 +9,7 @@ public class WordBankReader {
     public static String getWord(int letterCount) {
         try {
             //changed from earlier WordBankReader to attempt to help with some read errors. May not be entirely needed
-            InputStream inputStream = WordBankReader.class.getResourceAsStream("/WordBank.txt");
+            InputStream inputStream = WordBankReader.class.getResourceAsStream("/Project1/WordBank.txt");
 
             if (inputStream == null) {
                 System.out.println("WordBank.txt not found");

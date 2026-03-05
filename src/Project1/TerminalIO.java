@@ -1,3 +1,5 @@
+package Project1;
+
 import java.util.Scanner;
 
 public class TerminalIO {

@@ -1,3 +1,5 @@
+package Project1;
+
 import java.io.InputStream;
 import java.util.Scanner;
 import java.util.Random;
@@ -7,7 +9,7 @@ public class WordBankReader {
     public static String getWord(int letterCount) {
         try {
             // Load from classpath (works in IDE, JAR, anywhere)
-            InputStream inputStream = WordBankReader.class.getResourceAsStream("/WordBank.txt");
+            InputStream inputStream = WordBankReader.class.getResourceAsStream("/Project1/WordBank.txt");
 
             if (inputStream == null) {
                 System.out.println("WordBank.txt not found");
