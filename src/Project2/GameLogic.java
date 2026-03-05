@@ -34,6 +34,7 @@ public class  GameLogic {
     public boolean isReady() {
         return goalWord != null;
     }
+
     public int getWordLength() {
         return length;
     }

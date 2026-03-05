@@ -18,10 +18,33 @@ public class KeyboardIO implements ActionListener {
     // Base key - standard size
 
     class GeneralKey extends JButton {
+        private boolean muted = false;
+        private Color defaultBackground;
+
         public GeneralKey(String label) {
             super(label);
             setPreferredSize(new Dimension(55, 55));
             setOpaque(true);
+
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        if (muted) {
+                            muted = false;
+                            setBackground(defaultBackground);
+                        } else {
+                            defaultBackground = getBackground();
+                            muted = true;
+                            setBackground(Color.GRAY);
+                        }
+                    }
+                }
+            });
+        }
+
+        public boolean isMuted() {
+            return muted;
         }
     }
 
@@ -140,7 +163,10 @@ public class KeyboardIO implements ActionListener {
                 currentWord = currentWord.substring(0, currentWord.length() - 1);
             }
         } else {
-            currentWord += pressed;
+            GeneralKey key = (GeneralKey) event.getSource();
+            if (!key.isMuted()) {
+                currentWord += pressed;
+            }
         }
 
         wordDisplay.setText(currentWord);

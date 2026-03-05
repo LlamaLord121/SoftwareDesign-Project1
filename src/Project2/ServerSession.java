@@ -22,7 +22,7 @@ public class ServerSession {
                 PrintWriter out = new PrintWriter(new OutputStreamWriter(s.getOutputStream()), true)
                 //autoflush for simplicity
         ) {
-            out.println("Welcome to Fake Wordle");
+            out.println("Welcome to Fake Wordle\nRight click to disable (eliminated) keys, repeat to re-enable.");
             if (!startNewGame(out)) return;
 
             String line;
